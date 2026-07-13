@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iti_flutter_newsapp/pages/loading_screen.dart';
 import 'package:iti_flutter_newsapp/services/fetch_news_services.dart';
 import 'package:iti_flutter_newsapp/widgets/category_card.dart';
 import 'package:iti_flutter_newsapp/widgets/news_card.dart';
@@ -11,6 +12,8 @@ class NewsPage extends StatefulWidget {
 }
 
 class _NewsPageState extends State<NewsPage> {
+  bool isLoading = false;
+
   final List<String> categories = [
     'General',
     'Technology',
@@ -24,8 +27,11 @@ class _NewsPageState extends State<NewsPage> {
   String currentCategory = 'General';
 
   void fetchNews({required String selectedCategory}) async {
+    isLoading = true;
+    setState(() {});
     FetchNewsServices fetchNewsServices = FetchNewsServices();
     fetchedList = await fetchNewsServices.newsList(category: selectedCategory);
+    isLoading = false;
     setState(() {});
   }
 
@@ -79,18 +85,20 @@ class _NewsPageState extends State<NewsPage> {
             endIndent: 40,
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: fetchedList.length,
-              itemBuilder: (context, index) {
-                return NewsCard(
-                  title: fetchedList[index]['title'] ?? '',
-                  description: fetchedList[index]['description'] ?? '',
-                  imageURL:
-                      fetchedList[index]['urlToImage'] ??
-                      'https://picsum.photos/300/200',
-                );
-              },
-            ),
+            child: isLoading
+                ? const LoadingScreen()
+                : ListView.builder(
+                    itemCount: fetchedList.length,
+                    itemBuilder: (context, index) {
+                      return NewsCard(
+                        title: fetchedList[index]['title'] ?? '',
+                        description: fetchedList[index]['description'] ?? '',
+                        imageURL:
+                            fetchedList[index]['urlToImage'] ??
+                            'https://picsum.photos/300/200',
+                      );
+                    },
+                  ),
           ),
         ],
       ),
