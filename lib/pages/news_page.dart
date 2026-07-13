@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iti_flutter_newsapp/pages/loading_screen.dart';
+import 'package:iti_flutter_newsapp/pages/news_site_page.dart';
 import 'package:iti_flutter_newsapp/services/fetch_news_services.dart';
 import 'package:iti_flutter_newsapp/widgets/category_card.dart';
 import 'package:iti_flutter_newsapp/widgets/news_card.dart';
@@ -90,12 +91,28 @@ class _NewsPageState extends State<NewsPage> {
                 : ListView.builder(
                     itemCount: fetchedList.length,
                     itemBuilder: (context, index) {
-                      return NewsCard(
-                        title: fetchedList[index]['title'] ?? '',
-                        description: fetchedList[index]['description'] ?? '',
-                        imageURL:
-                            fetchedList[index]['urlToImage'] ??
-                            'https://picsum.photos/300/200',
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return NewsSitePage(
+                                  url:
+                                      fetchedList[index]['url'] ??
+                                      'https://www.bbc.com/news',
+                                );
+                              },
+                            ),
+                          );
+                        },
+                        child: NewsCard(
+                          title: fetchedList[index]['title'] ?? '',
+                          description: fetchedList[index]['description'] ?? '',
+                          imageURL:
+                              fetchedList[index]['urlToImage'] ??
+                              'https://picsum.photos/300/200',
+                        ),
                       );
                     },
                   ),

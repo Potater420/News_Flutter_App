@@ -10,6 +10,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: OnBoarding());
+    return const MaterialApp(home:OnBoarding());
   }
 }
