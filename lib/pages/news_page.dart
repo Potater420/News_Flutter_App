@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iti_flutter_newsapp/services/fetch_news_services.dart';
 import 'package:iti_flutter_newsapp/widgets/category_card.dart';
 import 'package:iti_flutter_newsapp/widgets/news_card.dart';
 
@@ -11,14 +12,28 @@ class NewsPage extends StatefulWidget {
 
 class _NewsPageState extends State<NewsPage> {
   final List<String> categories = [
-    'Business',
-    'Sports',
+    'General',
     'Technology',
-    'Health',
-    'Science',
+    'Sports',
+    'Money',
+    'Health'
   ];
 
-  String currentCategory = 'Business';
+  List<dynamic> fetchedList = []; // var fetchedList = [] ???
+
+  String currentCategory = 'General';
+
+  void fetchNews() async {
+    FetchNewsServices fetchNewsServices = FetchNewsServices();
+    fetchedList = await fetchNewsServices.newsList();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchNews();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,9 +79,13 @@ class _NewsPageState extends State<NewsPage> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: 2,
+              itemCount: fetchedList.length,
               itemBuilder: (context, index) {
-                return const NewsCard();
+                return NewsCard(
+                  title: fetchedList[index]['title']??'',
+                  description: fetchedList[index]['description']??'',
+                  imageURL: fetchedList[index]['urlToImage']??'https://picsum.photos/300/200',
+                );
               },
             ),
           ),
