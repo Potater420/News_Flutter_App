@@ -16,23 +16,23 @@ class _NewsPageState extends State<NewsPage> {
     'Technology',
     'Sports',
     'Money',
-    'Health'
+    'Health',
   ];
 
   List<dynamic> fetchedList = []; // var fetchedList = [] ???
 
   String currentCategory = 'General';
 
-  void fetchNews() async {
+  void fetchNews({required String selectedCategory}) async {
     FetchNewsServices fetchNewsServices = FetchNewsServices();
-    fetchedList = await fetchNewsServices.newsList();
+    fetchedList = await fetchNewsServices.newsList(category: selectedCategory);
     setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
-    fetchNews();
+    fetchNews(selectedCategory: currentCategory);
   }
 
   @override
@@ -63,6 +63,7 @@ class _NewsPageState extends State<NewsPage> {
                     setState(() {
                       currentCategory = categories[index];
                     });
+                    fetchNews(selectedCategory: currentCategory);
                   },
                   child: CategoryCard(
                     category: categories[index],
@@ -82,9 +83,11 @@ class _NewsPageState extends State<NewsPage> {
               itemCount: fetchedList.length,
               itemBuilder: (context, index) {
                 return NewsCard(
-                  title: fetchedList[index]['title']??'',
-                  description: fetchedList[index]['description']??'',
-                  imageURL: fetchedList[index]['urlToImage']??'https://picsum.photos/300/200',
+                  title: fetchedList[index]['title'] ?? '',
+                  description: fetchedList[index]['description'] ?? '',
+                  imageURL:
+                      fetchedList[index]['urlToImage'] ??
+                      'https://picsum.photos/300/200',
                 );
               },
             ),
