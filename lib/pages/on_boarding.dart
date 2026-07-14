@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:iti_flutter_newsapp/cubits/fetch_news_cubit/fetch_news_cubit.dart';
 import 'package:iti_flutter_newsapp/pages/news_page.dart';
 import 'package:lottie/lottie.dart';
 
@@ -42,6 +44,7 @@ class OnBoarding extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 60),
                     child: ElevatedButton(
                       onPressed: () {
+                        BlocProvider.of<FetchNewsCubit>(context).fetchNews(category: 'General');
                         Navigator.push(
                           context,
                           MaterialPageRoute(

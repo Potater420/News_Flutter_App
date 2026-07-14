@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:iti_flutter_newsapp/cubits/fetch_news_cubit/fetch_news_cubit.dart';
+import 'package:iti_flutter_newsapp/cubits/fetch_news_cubit/fetch_news_state.dart';
 import 'package:iti_flutter_newsapp/pages/loading_screen.dart';
 import 'package:iti_flutter_newsapp/pages/news_site_page.dart';
-import 'package:iti_flutter_newsapp/services/fetch_news_services.dart';
 import 'package:iti_flutter_newsapp/widgets/category_card.dart';
 import 'package:iti_flutter_newsapp/widgets/news_card.dart';
 
@@ -13,8 +15,6 @@ class NewsPage extends StatefulWidget {
 }
 
 class _NewsPageState extends State<NewsPage> {
-  bool isLoading = false;
-
   final List<String> categories = [
     'General',
     'Technology',
@@ -23,24 +23,7 @@ class _NewsPageState extends State<NewsPage> {
     'Health',
   ];
 
-  List<dynamic> fetchedList = []; // var fetchedList = [] ???
-
   String currentCategory = 'General';
-
-  void fetchNews({required String selectedCategory}) async {
-    isLoading = true;
-    setState(() {});
-    FetchNewsServices fetchNewsServices = FetchNewsServices();
-    fetchedList = await fetchNewsServices.newsList(category: selectedCategory);
-    isLoading = false;
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    fetchNews(selectedCategory: currentCategory);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +53,9 @@ class _NewsPageState extends State<NewsPage> {
                     setState(() {
                       currentCategory = categories[index];
                     });
-                    fetchNews(selectedCategory: currentCategory);
+                    BlocProvider.of<FetchNewsCubit>(
+                      context,
+                    ).fetchNews(category: currentCategory);
                   },
                   child: CategoryCard(
                     category: categories[index],
@@ -86,10 +71,15 @@ class _NewsPageState extends State<NewsPage> {
             endIndent: 40,
           ),
           Expanded(
-            child: isLoading
-                ? const LoadingScreen()
-                : ListView.builder(
-                    itemCount: fetchedList.length,
+            child: BlocBuilder<FetchNewsCubit,FetchNewsState>(
+              builder: (context, state) {
+                if (state is FetchNewsLoading) {
+                  return const LoadingScreen();
+                } else if (state is FetchNewsSuccess) {
+                  return ListView.builder(
+                    itemCount: BlocProvider.of<FetchNewsCubit>(
+                      context,
+                    ).newsList.length,
                     itemBuilder: (context, index) {
                       return GestureDetector(
                         onTap: () {
@@ -99,7 +89,9 @@ class _NewsPageState extends State<NewsPage> {
                               builder: (context) {
                                 return NewsSitePage(
                                   url:
-                                      fetchedList[index]['url'] ??
+                                      BlocProvider.of<FetchNewsCubit>(
+                                        context,
+                                      ).newsList[index]['url'] ??
                                       'https://www.bbc.com/news',
                                 );
                               },
@@ -107,18 +99,62 @@ class _NewsPageState extends State<NewsPage> {
                           );
                         },
                         child: NewsCard(
-                          title: fetchedList[index]['title'] ?? '',
-                          description: fetchedList[index]['description'] ?? '',
+                          title:
+                              BlocProvider.of<FetchNewsCubit>(
+                                context,
+                              ).newsList[index]['title'] ??
+                              '',
+                          description:
+                              BlocProvider.of<FetchNewsCubit>(
+                                context,
+                              ).newsList[index]['description'] ??
+                              '',
                           imageURL:
-                              fetchedList[index]['urlToImage'] ??
+                              BlocProvider.of<FetchNewsCubit>(
+                                context,
+                              ).newsList[index]['urlToImage'] ??
                               'https://picsum.photos/300/200',
                         ),
                       );
                     },
-                  ),
+                  );
+                }
+                return const Text('Failed loading');
+              },
+            ),
           ),
         ],
       ),
     );
   }
 }
+
+
+// ListView.builder(
+//                     itemCount: fetchedList.length,
+//                     itemBuilder: (context, index) {
+//                       return GestureDetector(
+//                         onTap: () {
+//                           Navigator.push(
+//                             context,
+//                             MaterialPageRoute(
+//                               builder: (context) {
+//                                 return NewsSitePage(
+//                                   url:
+//                                       fetchedList[index]['url'] ??
+//                                       'https://www.bbc.com/news',
+//                                 );
+//                               },
+//                             ),
+//                           );
+//                         },
+//                         child: NewsCard(
+//                           title: fetchedList[index]['title'] ?? '',
+//                           description: fetchedList[index]['description'] ?? '',
+//                           imageURL:
+//                               fetchedList[index]['urlToImage'] ??
+//                               'https://picsum.photos/300/200',
+//                         ),
+//                       );
+//                     },
+//                   ),

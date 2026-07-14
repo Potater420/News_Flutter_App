@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:iti_flutter_newsapp/cubits/fetch_news_cubit/fetch_news_cubit.dart';
 import 'package:iti_flutter_newsapp/pages/on_boarding.dart';
 
 void main() {
@@ -10,6 +12,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home:OnBoarding());
+    return BlocProvider(
+      create: (context) => FetchNewsCubit(),
+      child: const MaterialApp(home: OnBoarding()),
+    );
   }
 }
